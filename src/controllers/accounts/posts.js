@@ -22,6 +22,31 @@ const templateToData = {
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:bookmarks`;
         },
+        getPosts: async function (set, req, start, stop) {
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                replies: 'posts:replies',
+                views: 'posts:views',
+                latest: 'posts:recent',
+                oldest: 'posts:pid',
+            };
+    
+            if (!sort || !map[sort]) {
+                return await posts.getPostsFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, pids);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+    
+            const postsData = await posts.getPosts(pids, req.uid);
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
+        },
     },
     'account/posts': {
         type: 'posts',
@@ -219,7 +244,7 @@ async function getPostsFromUserSet(template, req, res, next) {
     userData.noItemsFoundKey = data.noItemsFoundKey;
     userData.title = `[[pages:${template}, ${userData.username}]]`;
     userData.breadcrumbs = helpers.buildBreadcrumbs([{ text: userData.username, url: `/user/${userData.userslug}` }, { text: data.crumb }]);
-    userData.showSort = template === 'account/watched';
+    userData.showSort = true;
     const baseUrl = (req.baseUrl + req.path.replace(/^\/api/, ''));
     userData.sortOptions = [
         { url: `${baseUrl}?sort=votes`, name: '[[global:votes]]' },
