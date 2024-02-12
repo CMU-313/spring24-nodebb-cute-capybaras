@@ -24,18 +24,18 @@
                     <tr>
                         <th align="left">
                             <a href="https://github.com/CMU-313/spring24-nodebb-cute-capybaras/commits?author=arararz&since=2024-01-20T00:00:00-05:00&until=2024-03-29T23:59:00-05:00">
-                            Commit: 3
+                            Commit: 4
                             </a>
                         </th>
                     </tr>
                     <tr>
                         <th align="left">
-                            Addition: 127
+                            Addition: 135
                         </th>
                     </tr>
                     <tr>
                         <th align="left">
-                            Deletion: 23
+                            Deletion: 83
                         </th>
                     <tr>
                     <tr>
