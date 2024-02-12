@@ -56,6 +56,15 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
         },
+        getPosts: async function (sets, req, start, stop) {
+            // Default sort by votes
+            let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
+            pids = await privileges.posts.filter('topics:read', pids, req.uid);
+            
+            // Fetching post summaries as before
+            const postObjs = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            return { posts: postObjs, nextStart: stop + 1 };
+        },
         getTopics: async (sets, req, start, stop) => {
             let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
             pids = await privileges.posts.filter('topics:read', pids, req.uid);
