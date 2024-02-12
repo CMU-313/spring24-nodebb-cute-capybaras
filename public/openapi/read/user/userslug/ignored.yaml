@@ -19,6 +19,8 @@ get:
               - $ref: ../../../components/schemas/UserObject.yaml#/UserObjectFull
               - type: object
                 properties:
+                  moderationNote:
+                    type: string
                   topics:
                     type: array
                     items:
@@ -29,7 +31,7 @@ get:
                     type: string
                   title:
                     type: string
-                  showSort:
+                  showSort: true
                     type: boolean
                   sortOptions:
                     type: array
