@@ -26,24 +26,23 @@ const templateToData = {
             const { sort } = req.query;
             const map = {
                 votes: 'posts:votes',
-                replies: 'posts:replies',
-                views: 'posts:views',
-                latest: 'posts:recent',
-                oldest: 'posts:pid',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
             };
     
             if (!sort || !map[sort]) {
-                return await posts.getPostsFromSet(set, req.uid, start, stop);
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
             }
             const sortSet = map[sort];
+            const negate = sort === 'lastpost';
             let pids = await db.getSortedSetRevRange(set, 0, -1);
-            const scores = await db.sortedSetScores(sortSet, pids);
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
             pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
                 .sort((a, b) => b.score - a.score)
                 .slice(start, stop + 1)
                 .map(p => p.pid);
     
-            const postsData = await posts.getPosts(pids, req.uid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
             posts.calculatePostIndices(postsData, start);
             return { posts: postsData, nextStart: stop + 1 };
         },
@@ -246,10 +245,14 @@ async function getPostsFromUserSet(template, req, res, next) {
     userData.breadcrumbs = helpers.buildBreadcrumbs([{ text: userData.username, url: `/user/${userData.userslug}` }, { text: data.crumb }]);
     userData.showSort = true;
     const baseUrl = (req.baseUrl + req.path.replace(/^\/api/, ''));
-    userData.sortOptions = [
+    userData.sortOptions = data.type === 'topics' ? [
         { url: `${baseUrl}?sort=votes`, name: '[[global:votes]]' },
         { url: `${baseUrl}?sort=posts`, name: '[[global:posts]]' },
         { url: `${baseUrl}?sort=views`, name: '[[global:views]]' },
+        { url: `${baseUrl}?sort=lastpost`, name: '[[global:lastpost]]' },
+        { url: `${baseUrl}?sort=firstpost`, name: '[[global:firstpost]]' },
+    ] : [
+        { url: `${baseUrl}?sort=votes`, name: '[[global:votes]]' },
         { url: `${baseUrl}?sort=lastpost`, name: '[[global:lastpost]]' },
         { url: `${baseUrl}?sort=firstpost`, name: '[[global:firstpost]]' },
     ];
@@ -263,6 +266,9 @@ async function getPostsFromUserSet(template, req, res, next) {
 async function getItemData(sets, data, req, start, stop) {
     if (data.getTopics) {
         return await data.getTopics(sets, req, start, stop);
+    }
+    if (data.getPosts) {
+        return await data.getPosts(sets, req, start, stop);
     }
     const method = data.type === 'topics' ? topics.getTopicsFromSet : posts.getPostSummariesFromSet;
     return await method(sets, req.uid, start, stop);

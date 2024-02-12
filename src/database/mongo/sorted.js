@@ -284,7 +284,7 @@ module.exports = function (module) {
         return keys.map(key => (map[key] ? map[key].score : null));
     };
 
-    module.sortedSetScores = async function (key, values) {
+    module.sortedSetScores = async function (key, values, negated = false) {
         if (!key) {
             return null;
         }
@@ -301,7 +301,7 @@ module.exports = function (module) {
             }
         });
 
-        return values.map(v => (utils.isNumber(valueToScore[v]) ? valueToScore[v] : null));
+        return values.map(v => (utils.isNumber(valueToScore[v]) ? (negated ? -valueToScore[v] : valueToScore[v]) : null));
     };
 
     module.isSortedSetMember = async function (key, value) {
