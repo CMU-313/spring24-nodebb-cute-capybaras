@@ -219,7 +219,7 @@ async function getPostsFromUserSet(template, req, res, next) {
     userData.noItemsFoundKey = data.noItemsFoundKey;
     userData.title = `[[pages:${template}, ${userData.username}]]`;
     userData.breadcrumbs = helpers.buildBreadcrumbs([{ text: userData.username, url: `/user/${userData.userslug}` }, { text: data.crumb }]);
-    userData.showSort = template === 'account/watched';
+    userData.showSort = true;
     const baseUrl = (req.baseUrl + req.path.replace(/^\/api/, ''));
     userData.sortOptions = [
         { url: `${baseUrl}?sort=votes`, name: '[[global:votes]]' },
