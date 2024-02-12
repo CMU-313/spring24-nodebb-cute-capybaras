@@ -24,7 +24,7 @@
                     <tr>
                         <th align="left">
                             <a href="https://github.com/CMU-313/spring24-nodebb-cute-capybaras/commits?author=AlinaFang1123&since=2024-01-20T00:00:00-05:00&until=2024-03-29T23:59:00-05:00">
-                            Commit: 2
+                            Commit: 3
                             </a>
                         </th>
                     </tr>
@@ -35,7 +35,7 @@
                     </tr>
                     <tr>
                         <th align="left">
-                            Deletion: 2
+                            Deletion: 24
                         </th>
                     <tr>
                     <tr>
