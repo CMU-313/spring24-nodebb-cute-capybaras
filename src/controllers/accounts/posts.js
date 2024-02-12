@@ -56,28 +56,6 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
         },
-        getPosts: async function (sets, req, start, stop) {
-            // Keeping the default sort by votes from Commit 1
-            let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
-            pids = await privileges.posts.filter('topics:read', pids, req.uid);
-            
-            // Enhanced: If sort by date is requested, reorder the pids
-            if (sort === 'latest' || sort === 'oldest') {
-                // Fetch posts to sort by timestamp
-                let postsData = await posts.getPostsFields(pids, ['pid', 'timestamp']);
-                if (sort === 'latest') {
-                    postsData.sort((a, b) => b.timestamp - a.timestamp);
-                } else if (sort === 'oldest') {
-                    postsData.sort((a, b) => a.timestamp - b.timestamp);
-                }
-                // Reassign sorted pids based on timestamp
-                pids = postsData.map(post => post.pid);
-            }
-        
-            // Continue fetching post summaries as before, now with sorted pids
-            const postObjs = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
-            return { posts: postObjs, nextStart: stop + 1 };
-        },
         getTopics: async (sets, req, start, stop) => {
             let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
             pids = await privileges.posts.filter('topics:read', pids, req.uid);
