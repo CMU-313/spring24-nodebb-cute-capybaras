@@ -351,7 +351,7 @@ SELECT o."_key" k,
         });
     };
 
-    module.sortedSetScores = async function (key, values, negated = false) {
+    module.sortedSetScores = async function (key, values) {
         if (!key) {
             return null;
         }
@@ -376,7 +376,7 @@ SELECT z."value" v,
 
         return values.map((v) => {
             const s = res.rows.find(r => r.v === v);
-            return s ? (negated ? -parseFloat(s.s): parseFloat(s.s)) : null;
+            return s ? parseFloat(s.s) : null;
         });
     };
 

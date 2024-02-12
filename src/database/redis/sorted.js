@@ -187,14 +187,14 @@ module.exports = function (module) {
         return scores.map(d => (d === null ? d : parseFloat(d)));
     };
 
-    module.sortedSetScores = async function (key, values, negated = false) {
+    module.sortedSetScores = async function (key, values) {
         if (!values.length) {
             return [];
         }
         const batch = module.client.batch();
         values.forEach(value => batch.zscore(String(key), String(value)));
         const scores = await helpers.execBatch(batch);
-        return scores.map(d => (d === null ? d : (negated ? -parseFloat(d) : parseFloat(d))));
+        return scores.map(d => (d === null ? d : parseFloat(d)));
     };
 
     module.isSortedSetMember = async function (key, value) {
