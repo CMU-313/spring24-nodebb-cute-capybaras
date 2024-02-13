@@ -1,5 +1,7 @@
 'use strict';
 
+const assert = require('assert');
+
 module.exports = function (module) {
     const helpers = require('./helpers');
     const util = require('util');
@@ -351,7 +353,10 @@ SELECT o."_key" k,
         });
     };
 
-    module.sortedSetScores = async function (key, values) {
+    module.sortedSetScores = async function (key, values, negated = false) { // negated is of type boolean
+        assert(typeof (negated) === 'boolean', 'negated must be a boolean');
+        const mult = negated ? -1 : 1;
+        assert(typeof (mult) === 'number', 'mult must be a number');
         if (!key) {
             return null;
         }
@@ -376,7 +381,7 @@ SELECT z."value" v,
 
         return values.map((v) => {
             const s = res.rows.find(r => r.v === v);
-            return s ? parseFloat(s.s) : null;
+            return s ? mult * parseFloat(s.s) : null;
         });
     };
 
