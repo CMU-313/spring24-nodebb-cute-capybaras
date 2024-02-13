@@ -17,7 +17,6 @@ require('./edit')(Posts);
 require('./parse')(Posts);
 require('./user')(Posts);
 require('./topics')(Posts);
-require('./sorted')(Posts);
 require('./category')(Posts);
 require('./summary')(Posts);
 require('./recent')(Posts);
