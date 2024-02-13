@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const db = require('../../database');
 const user = require('../../user');
 const posts = require('../../posts');
@@ -22,26 +23,25 @@ const templateToData = {
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:bookmarks`;
         },
-        getPosts: async function (set, req, start, stop) {
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
             const { sort } = req.query;
             const map = {
                 votes: 'posts:votes',
                 firstpost: 'posts:pid',
                 lastpost: 'posts:pid',
             };
-    
             if (!sort || !map[sort]) {
                 return posts.getPostSummariesFromSet(set, req.uid, start, stop);
             }
             const sortSet = map[sort];
-            const negate = sort === 'lastpost';
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
             let pids = await db.getSortedSetRevRange(set, 0, -1);
             const scores = await db.sortedSetScores(sortSet, pids, negate);
             pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
                 .sort((a, b) => b.score - a.score)
                 .slice(start, stop + 1)
                 .map(p => p.pid);
-    
             const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
             posts.calculatePostIndices(postsData, start);
             return { posts: postsData, nextStart: stop + 1 };

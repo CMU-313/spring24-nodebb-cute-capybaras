@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const _ = require('lodash');
 const utils = require('../../utils');
 
@@ -284,7 +285,10 @@ module.exports = function (module) {
         return keys.map(key => (map[key] ? map[key].score : null));
     };
 
-    module.sortedSetScores = async function (key, values, negated = false) {
+    module.sortedSetScores = async function (key, values, negated = false) { // negated is of type boolean
+        assert(typeof (negated) === 'boolean', 'negated is not a boolean');
+        const mult = negated ? -1 : 1; // mult is of type number
+        assert(typeof (mult) === 'number', 'mult is not a number');
         if (!key) {
             return null;
         }
@@ -301,7 +305,7 @@ module.exports = function (module) {
             }
         });
 
-        return values.map(v => (utils.isNumber(valueToScore[v]) ? (negated ? -valueToScore[v] : valueToScore[v]) : null));
+        return values.map(v => (utils.isNumber(valueToScore[v]) ? mult * valueToScore[v] : null));
     };
 
     module.isSortedSetMember = async function (key, value) {

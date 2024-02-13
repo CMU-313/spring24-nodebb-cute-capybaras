@@ -1,5 +1,7 @@
 'use strict';
 
+const assert = require('assert');
+
 module.exports = function (module) {
     const utils = require('../../utils');
     const helpers = require('./helpers');
@@ -187,14 +189,17 @@ module.exports = function (module) {
         return scores.map(d => (d === null ? d : parseFloat(d)));
     };
 
-    module.sortedSetScores = async function (key, values, negated = false) {
+    module.sortedSetScores = async function (key, values, negated = false) { // negated is of type boolean
+        assert(typeof (negated) === 'boolean', 'negated is not a boolean');
+        const mult = negated ? -1 : 1; // mult is of type number
+        assert(typeof (mult) === 'number', 'mult is not a number');
         if (!values.length) {
             return [];
         }
         const batch = module.client.batch();
         values.forEach(value => batch.zscore(String(key), String(value)));
         const scores = await helpers.execBatch(batch);
-        return scores.map(d => (d === null ? d : (negated ? -parseFloat(d) : parseFloat(d))));
+        return scores.map(d => (d === null ? d : mult * parseFloat(d)));
     };
 
     module.isSortedSetMember = async function (key, value) {
