@@ -159,6 +159,31 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:tids`);
         },
+        getTopics: async function (set, req, start, stop) {
+            const { sort } = req.query;
+            const map = {
+                votes: 'topics:votes',
+                posts: 'topics:posts',
+                views: 'topics:views',
+                lastpost: 'topics:recent',
+                firstpost: 'topics:tid',
+            };
+
+            if (!sort || !map[sort]) {
+                return await topics.getTopicsFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            let tids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, tids);
+            tids = tids.map((tid, i) => ({ tid: tid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(t => t.tid);
+
+            const topicsData = await topics.getTopics(tids, req.uid);
+            topics.calculateTopicIndices(topicsData, start);
+            return { topics: topicsData, nextStart: stop + 1 };
+        },
     },
 };
 
