@@ -19,6 +19,8 @@ get:
               - $ref: ../../../components/schemas/UserObject.yaml#/UserObjectFull
               - type: object
                 properties:
+                  moderationNote:
+                    type: string
                   topics:
                     type: array
                     items:
