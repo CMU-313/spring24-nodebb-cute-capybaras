@@ -56,28 +56,6 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
         },
-        getPosts: async function (sets, req, start, stop) {
-            // Keeping the default sort by votes from Commit 1
-            let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
-            pids = await privileges.posts.filter('topics:read', pids, req.uid);
-            
-            // Enhanced: If sort by date is requested, reorder the pids
-            if (sort === 'latest' || sort === 'oldest') {
-                // Fetch posts to sort by timestamp
-                let postsData = await posts.getPostsFields(pids, ['pid', 'timestamp']);
-                if (sort === 'latest') {
-                    postsData.sort((a, b) => b.timestamp - a.timestamp);
-                } else if (sort === 'oldest') {
-                    postsData.sort((a, b) => a.timestamp - b.timestamp);
-                }
-                // Reassign sorted pids based on timestamp
-                pids = postsData.map(post => post.pid);
-            }
-        
-            // Continue fetching post summaries as before, now with sorted pids
-            const postObjs = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
-            return { posts: postObjs, nextStart: stop + 1 };
-        },
         getTopics: async (sets, req, start, stop) => {
             let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
             pids = await privileges.posts.filter('topics:read', pids, req.uid);
@@ -156,6 +134,31 @@ const templateToData = {
         getSets: async function (callerUid, userData) {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:tids`);
+        },
+        getTopics: async function (set, req, start, stop) {
+            const { sort } = req.query;
+            const map = {
+                votes: 'topics:votes',
+                posts: 'topics:posts',
+                views: 'topics:views',
+                lastpost: 'topics:recent',
+                firstpost: 'topics:tid',
+            };
+
+            if (!sort || !map[sort]) {
+                return await topics.getTopicsFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            let tids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, tids);
+            tids = tids.map((tid, i) => ({ tid: tid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(t => t.tid);
+
+            const topicsData = await topics.getTopics(tids, req.uid);
+            topics.calculateTopicIndices(topicsData, start);
+            return { topics: topicsData, nextStart: stop + 1 };
         },
     },
 };
