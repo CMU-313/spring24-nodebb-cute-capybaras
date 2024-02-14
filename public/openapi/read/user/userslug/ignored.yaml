@@ -31,7 +31,7 @@ get:
                     type: string
                   title:
                     type: string
-                  showSort: true
+                  showSort:
                     type: boolean
                   sortOptions:
                     type: array
