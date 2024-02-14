@@ -39,29 +39,6 @@ const templateToData = {
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:upvote`;
         },
-        getPosts: async function (set, req, start, stop) {
-            const { sort } = req.query;
-            const map = {
-                votes: 'posts:votes',
-                views: 'posts:views',
-                firstpost: 'posts:pid',
-                lastpost: 'posts:pid',
-            };
-            if (!sort || !map[sort]) {
-                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
-            }
-            const sortSet = map[sort];
-            const negate = sort === 'lastpost';
-            let pids = await db.getSortedSetRevRange(set, 0, -1);
-            const scores = await db.sortedSetScores(sortSet, pids, negate);
-            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
-                .sort((a, b) => b.score - a.score)
-                .slice(start, stop + 1)
-                .map(p => p.pid);
-            const postsData = await posts.getPostSummaryByPids(pids, req.uid);
-            posts.calculatePostIndices(postsData, start);
-            return { posts: postsData, nextStart: stop + 1 };
-        },
     },
     'account/downvoted': {
         type: 'posts',
@@ -69,29 +46,6 @@ const templateToData = {
         crumb: '[[global:downvoted]]',
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:downvote`;
-        },
-        getPosts: async function (set, req, start, stop) {
-            const { sort } = req.query;
-            const map = {
-                votes: 'posts:votes',
-                views: 'posts:views',
-                firstpost: 'posts:pid',
-                lastpost: 'posts:pid',
-            };
-            if (!sort || !map[sort]) {
-                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
-            }
-            const sortSet = map[sort];
-            const negate = sort === 'lastpost';
-            let pids = await db.getSortedSetRevRange(set, 0, -1);
-            const scores = await db.sortedSetScores(sortSet, pids, negate);
-            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
-                .sort((a, b) => b.score - a.score)
-                .slice(start, stop + 1)
-                .map(p => p.pid);
-            const postsData = await posts.getPostSummaryByPids(pids, req.uid);
-            posts.calculatePostIndices(postsData, start);
-            return { posts: postsData, nextStart: stop + 1 };
         },
     },
     'account/best': {
