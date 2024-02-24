@@ -13,7 +13,16 @@
                 </a>
             {{{end}}}
         </div>
-
+        <!-- Author Name Display -->
+        <div class="author-name">
+            {{{if (posts.anonymous == "true")}}}
+                <span itemprop="author">Guest Contributor</span>
+            {{{else}}}
+                <a href="{config.relative_path}/user/{posts.user.userslug || '#'}" itemprop="author">
+                    {posts.user.displayname}
+                </a>
+            {{{end}}}
+        </div>
     </div>
 
         <!-- IMPORT partials/topic/badge.tpl -->
