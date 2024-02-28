@@ -78,63 +78,6 @@ describe('Post\'s', () => {
         });
     });
 
-    // ChatGPT Wrote this
-    // Test suite for checking the anonymous toggle functionality on posts
-    describe('anonymous toggle functionality', () => {
-        // Test case to check if a post can be made anonymous successfully
-        it('should anonymize a post', async () => {
-            // Anonymize the post and capture the response
-            const response = await apiPosts.anonymous({ uid: voterUid }, { pid: postData.pid, room_id: `topic_${postData.tid}` });
-            // Assert that the response confirms the post is now anonymous
-            assert.strictEqual(response.isAnonymous, true);
-        });
-
-        // Test case to check if a post can be reverted from anonymous to attributed to a user
-        it('should remove anonymity from a post', async () => {
-            // Remove anonymity from the post and capture the response
-            const response = await apiPosts.unanonymous({ uid: voterUid }, { pid: postData.pid, room_id: `topic_${postData.tid}` });
-            // Assert that the response confirms the post is no longer anonymous
-            assert.strictEqual(response.isAnonymous, false);
-        });
-    });
-    // before(async () => {
-    //     // Create a test category
-    //     const categoryData = await categories.create({ name: 'Test Category', description: 'Test category created by testing script' });
-    //     cid = categoryData.cid;
-    //     // Create a test user
-    //     const userData = await user.create({ username: 'testuser' });
-    //     uid = userData.uid;
-    //     // Create a test post within the created category and by the created user
-    //     const postData = await posts.create({
-    //         uid: uid,
-    //         cid: cid,
-    //         content: 'Test post content',
-    //     });
-    //     pid = postData.pid; // Store the post ID for later use
-    // });
-    // // Describe the test suite for 'Votes Sorting'
-    // describe('Votes Sorting', () => {
-    //     // Test to ensure that a post's ID is added to the sorted set for votes
-    //     it('should add the pid to the :votes sorted set for that user', async () => {
-    //         // Assume the post has a vote score of 10 for this test
-    //         await db.sortedSetAdd(`cid:${cid}:uid:${uid}:pids:votes`, 10, pid);
-    //         const score = await db.sortedSetScore(`cid:${cid}:uid:${uid}:pids:votes`, pid);
-    //         assert.strictEqual(score, 10);
-    //     });
-    //     // Test to check if the function returns the posts sorted by votes
-    //     it('should return posts sorted by votes', async () => {
-    //         // Add multiple posts with different scores
-    //         await Promise.all([
-    //             db.sortedSetAdd(`cid:${cid}:uid:${uid}:pids:votes`, 5, pid + 1),
-    //             db.sortedSetAdd(`cid:${cid}:uid:${uid}:pids:votes`, 15, pid + 2),
-    //             // Assuming pid is the original post with a score of 10
-    //         ]);
-    //         // Retrieve the posts sorted by their vote scores
-    //         const sortedPids = await posts.getSortedPidsByVotes(cid, uid, 0, -1);
-    //         // Assert that the posts are returned in the order of their scores
-    //         assert.deepStrictEqual(sortedPids, [String(pid + 2), String(pid), String(pid + 1)]);
-    //     });
-    // });
     it('should update category teaser properly', async () => {
         const util = require('util');
         const getCategoriesAsync = util.promisify(async (callback) => {
