@@ -32,9 +32,12 @@ module.exports = function (SocketPosts) {
             postSharing: social.getActivePostSharing(),
             history: posts.diffs.exists(data.pid),
             canViewInfo: privileges.global.can('view:users:info', socket.uid),
+            anonymous: posts.hasAnonymous(data.pid, socket.uid),
+            // make sure naming is hasAnonymous
         });
 
         const postData = results.posts;
+        postData.anonymous = results.anonymous;
         postData.absolute_url = `${nconf.get('url')}/post/${data.pid}`;
         postData.bookmarked = results.bookmarked;
         postData.selfPost = socket.uid && socket.uid === postData.uid;
