@@ -13,6 +13,7 @@
                 </a>
             {{{end}}}
         </div>
+
         <!-- Author Name Display -->
         <div class="author-name">
             {{{if (posts.anonymous == "true")}}}
