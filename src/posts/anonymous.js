@@ -39,7 +39,7 @@ module.exports = function (Posts) {
         }
         await db[Anonymousing ? 'setAdd' : 'setRemove'](`pid:${pid}:user_anonymous`, uid);
         postData.anonymous = await db.setCount(`pid:${pid}:user_anonymous`);
-        await Posts.setPostField(pid, 'anonymous', postData.isAnonymous);
+        await Posts.setPostField(pid, 'anonymous', postData.anonymous);
 
         plugins.hooks.fire(`action:post.${type}`, {
             pid: pid,
