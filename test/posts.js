@@ -77,7 +77,25 @@ describe('Post\'s', () => {
             });
         });
     });
+    // ChatGPT Wrote this
+    // Test suite for checking the anonymous toggle functionality on posts
+    describe('anonymous toggle functionality', () => {
+        // Test case to check if a post can be made anonymous successfully
+        it('should anonymize a post', async () => {
+            // Anonymize the post and capture the response
+            const response = await apiPosts.anonymous({ uid: voterUid }, { pid: postData.pid, room_id: `topic_${postData.tid}` });
+            // Assert that the response confirms the post is now anonymous
+            assert.strictEqual(response.isAnonymous, true);
+        });
 
+        // Test case to check if a post can be reverted from anonymous to attributed to a user
+        it('should remove anonymity from a post', async () => {
+            // Remove anonymity from the post and capture the response
+            const response = await apiPosts.unanonymous({ uid: voterUid }, { pid: postData.pid, room_id: `topic_${postData.tid}` });
+            // Assert that the response confirms the post is no longer anonymous
+            assert.strictEqual(response.isAnonymous, false);
+        });
+    });
     it('should update category teaser properly', async () => {
         const util = require('util');
         const getCategoriesAsync = util.promisify(async (callback) => {

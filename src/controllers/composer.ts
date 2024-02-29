@@ -62,13 +62,13 @@ type ComposerData = {
     timestamp: number,
     content: string,
     fromQueue: boolean,
-    anonymous: boolean,
     tid?: number,
     cid?: number,
     title?: string,
     tags?: string[],
     thumb?: string,
     noscript?: string,
+    anonymous: boolean,
 }
 
 type QueueResult = {
