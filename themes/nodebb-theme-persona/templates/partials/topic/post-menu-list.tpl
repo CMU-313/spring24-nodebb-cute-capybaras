@@ -1,20 +1,20 @@
 <!-- IF posts.display_moderator_tools -->
 <li class="dropdown-header">[[topic:tools]]</li>
-<li>
-    <a component="post/edit" role="menuitem" tabindex="-1" href="#">
-        <span class="menu-icon"><i class="fa fa-fw fa-pencil"></i></span> [[topic:edit]]
-    </a>
-</li>
 <li class="menu-item">
-    <!-- Anonymous Posting Toggle Button -->
-    <a component="post/anonymous-toggle" role="menuitem" tabindex="-1" href="#" data-anonymous="{posts.anonymous}">
+    <!-- Anonymous Posting Button -->
+    <a component="post/anonymous" role="menuitem" tabindex="-1" href="#" data-anonymous="{posts.anonymous}">
         <div class="menu-icon-wrapper">
             <!-- Icon for Anonymous On state -->
             <i component="post/anonymous/on" class="fa fa-fw fa-eye <!-- IF !posts.anonymous -->hidden<!-- ENDIF posts.anonymous -->"></i>
             <!-- Icon for Anonymous Off state -->
             <i component="post/anonymous/off" class="fa fa-fw fa-eye-slash <!-- IF posts.anonymous -->hidden<!-- ENDIF posts.anonymous -->"></i>
         </div>
-        <span class="toggle-text">Toggle Anonymous Mode</span>
+        <span class="toggle-text">Anonymize</span>
+    </a>
+</li>
+<li>
+    <a component="post/edit" role="menuitem" tabindex="-1" href="#">
+        <span class="menu-icon"><i class="fa fa-fw fa-pencil"></i></span> [[topic:edit]]
     </a>
 </li>
 <li <!-- IF posts.deleted -->hidden<!-- ENDIF posts.deleted -->>
