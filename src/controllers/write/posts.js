@@ -1,7 +1,7 @@
 'use strict';
 
-const posts = require('../../posts');
 const assert = require('assert');
+const posts = require('../../posts');
 const privileges = require('../../privileges');
 
 const api = require('../../api');
@@ -85,14 +85,14 @@ Posts.unbookmark = async (req, res) => {
 };
 
 Posts.anonymous = async (req, res) => {
-    assert(typeof(req) == 'object' && typeof(res) == 'object', "req and res must be objects");
+    assert(typeof (req) === 'object' && typeof (res) === 'object', 'req and res must be objects');
     const data = await mock(req);
     await api.posts.anonymous(req, data);
     helpers.formatApiResponse(200, res);
 };
 
 Posts.unanonymous = async (req, res) => {
-    assert(typeof(req) == 'object' && typeof(res) == 'object', "req and res must be objects");
+    assert(typeof (req) === 'object' && typeof (res) === 'object', 'req and res must be objects');
     const data = await mock(req);
     await api.posts.unanonymous(req, data);
     helpers.formatApiResponse(200, res);

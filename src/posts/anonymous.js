@@ -1,7 +1,7 @@
 'use strict';
 
-const db = require('../database');
 const assert = require('assert');
+const db = require('../database');
 const plugins = require('../plugins');
 
 module.exports = function (Posts) {
@@ -17,7 +17,8 @@ module.exports = function (Posts) {
         return await toggleAnonymous('unanonymous', pid, uid);
     };
 
-    async function toggleAnonymous(type, pid, uid) { // Note that the function has mostly identical types and names to the function in src/posts/bookmarks.js
+    async function toggleAnonymous(type, pid, uid) { /* Note that the function has mostly identical
+        types and names to the function in src/posts/bookmarks.js */
         assert(typeof pid === 'number', '[[error:invalid-pid]]');
         assert(typeof uid === 'number', '[[error:invalid-uid]]');
         if (parseInt(uid, 10) <= 0) {
@@ -25,7 +26,7 @@ module.exports = function (Posts) {
         }
 
         const Anonymousing = type === 'anonymous';
-        assert(typeof Anonymousing === 'boolean', '[[error:invalid-type]]')
+        assert(typeof Anonymousing === 'boolean', '[[error:invalid-type]]');
 
         const [postData, isAnonymous] = await Promise.all([
             Posts.getPostFields(pid, ['pid', 'uid']),
@@ -62,7 +63,8 @@ module.exports = function (Posts) {
         };
     }
 
-    Posts.isAnonymous = async function (pid, uid) { // Note that the function has mostly identical types and names to the function in src/posts/bookmarks.js
+    Posts.isAnonymous = async function (pid, uid) { /* Note that the function has mostly identical types
+    and names to the function in src/posts/bookmarks.js */
         if (parseInt(uid, 10) <= 0) {
             return Array.isArray(pid) ? pid.map(() => false) : false;
         }

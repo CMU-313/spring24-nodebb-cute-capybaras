@@ -88,7 +88,7 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
         timestamp: Date.now(),
         content: body.content,
         fromQueue: false,
-        anonymous: false
+        anonymous: false,
     };
     req.body.noscript = 'true';
 
