@@ -1,23 +1,31 @@
 'use strict';
 
 const db = require('../database');
+const { assert } = require('../middleware');
 const plugins = require('../plugins');
 
 module.exports = function (Posts) {
     Posts.anonymous = async function (pid, uid) {
+        assert(typeof pid === 'number', '[[error:invalid-pid]]');
+        assert(typeof uid === 'number', '[[error:invalid-uid]]');
         return await toggleAnonymous('anonymous', pid, uid);
     };
 
     Posts.unanonymous = async function (pid, uid) {
+        assert(typeof pid === 'number', '[[error:invalid-pid]]');
+        assert(typeof uid === 'number', '[[error:invalid-uid]]');
         return await toggleAnonymous('unanonymous', pid, uid);
     };
 
-    async function toggleAnonymous(type, pid, uid) {
+    async function toggleAnonymous(type, pid, uid) { // Note that the function has mostly identical types and names to the function in src/posts/bookmarks.js
+        assert(typeof pid === 'number', '[[error:invalid-pid]]');
+        assert(typeof uid === 'number', '[[error:invalid-uid]]');
         if (parseInt(uid, 10) <= 0) {
             throw new Error('[[error:not-logged-in]]');
         }
 
         const Anonymousing = type === 'anonymous';
+        assert(typeof Anonymousing === 'boolean', '[[error:invalid-type]]')
 
         const [postData, isAnonymous] = await Promise.all([
             Posts.getPostFields(pid, ['pid', 'uid']),
@@ -54,7 +62,7 @@ module.exports = function (Posts) {
         };
     }
 
-    Posts.isAnonymous = async function (pid, uid) {
+    Posts.isAnonymous = async function (pid, uid) { // Note that the function has mostly identical types and names to the function in src/posts/bookmarks.js
         if (parseInt(uid, 10) <= 0) {
             return Array.isArray(pid) ? pid.map(() => false) : false;
         }
