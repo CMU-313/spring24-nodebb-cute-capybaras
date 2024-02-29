@@ -23,9 +23,11 @@ require('./recent')(Posts);
 require('./tools')(Posts);
 require('./votes')(Posts);
 require('./bookmarks')(Posts);
+require('./anonymous')(Posts);
 require('./queue')(Posts);
 require('./diffs')(Posts);
 require('./uploads')(Posts);
+require('./sorted')(Posts);
 
 Posts.exists = async function (pids) {
     return await db.exists(

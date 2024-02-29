@@ -520,6 +520,7 @@
         <i class="fa fa-plus-square"></i>
         <i class="fa fa-plus-square-o"></i>
         <i class="fa fa-podcast"></i>
+        <i class="fa fa-poll"></i>
         <i class="fa fa-power-off"></i>
         <i class="fa fa-print"></i>
         <i class="fa fa-product-hunt"></i>

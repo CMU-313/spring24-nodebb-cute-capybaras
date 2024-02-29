@@ -55,6 +55,29 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids`);
         },
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
+            };
+            if (!sort || !map[sort]) {
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
+        },
     },
     'account/upvoted': {
         type: 'posts',
@@ -63,6 +86,29 @@ const templateToData = {
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:upvote`;
         },
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
+            };
+            if (!sort || !map[sort]) {
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
+        },
     },
     'account/downvoted': {
         type: 'posts',
@@ -70,6 +116,29 @@ const templateToData = {
         crumb: '[[global:downvoted]]',
         getSets: function (callerUid, userData) {
             return `uid:${userData.uid}:downvote`;
+        },
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
+            };
+            if (!sort || !map[sort]) {
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
         },
     },
     'account/best': {
@@ -80,11 +149,29 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
         },
-        getTopics: async (sets, req, start, stop) => {
-            let pids = await db.getSortedSetRevRangeByScore(sets, start, stop - start + 1, '+inf', 1);
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
+            };
+            if (!sort || !map[sort]) {
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
             pids = await privileges.posts.filter('topics:read', pids, req.uid);
-            const postObjs = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
-            return { posts: postObjs, nextStart: stop + 1 };
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
         },
         getItemCount: async (sets) => {
             const counts = await Promise.all(sets.map(set => db.sortedSetCount(set, 1, '+inf')));
@@ -99,11 +186,29 @@ const templateToData = {
             const cids = await categories.getCidsByPrivilege('categories:cid', callerUid, 'topics:read');
             return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
         },
-        getTopics: async (sets, req, start, stop) => {
-            let pids = await db.getSortedSetRangeByScore(sets, start, stop - start + 1, '-inf', -1);
+        getPosts: async function (set, req, start, stop) { // Type of variables are identical to getTopics in watched
+            const { sort } = req.query;
+            const map = {
+                votes: 'posts:votes',
+                firstpost: 'posts:pid',
+                lastpost: 'posts:pid',
+            };
+            if (!sort || !map[sort]) {
+                return posts.getPostSummariesFromSet(set, req.uid, start, stop);
+            }
+            const sortSet = map[sort];
+            const negate = sort === 'lastpost'; // negate is a boolean
+            assert(typeof (negate) === 'boolean', 'negate must be a boolean');
+            let pids = await db.getSortedSetRevRange(set, 0, -1);
             pids = await privileges.posts.filter('topics:read', pids, req.uid);
-            const postObjs = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
-            return { posts: postObjs, nextStart: stop + 1 };
+            const scores = await db.sortedSetScores(sortSet, pids, negate);
+            pids = pids.map((pid, i) => ({ pid: pid, score: scores[i] }))
+                .sort((a, b) => b.score - a.score)
+                .slice(start, stop + 1)
+                .map(p => p.pid);
+            const postsData = await posts.getPostSummaryByPids(pids, req.uid, { stripTags: false });
+            posts.calculatePostIndices(postsData, start);
+            return { posts: postsData, nextStart: stop + 1 };
         },
         getItemCount: async (sets) => {
             const counts = await Promise.all(sets.map(set => db.sortedSetCount(set, '-inf', -1)));
