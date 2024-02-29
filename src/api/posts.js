@@ -258,8 +258,9 @@ postsAPI.move = async function (caller, data) {
 async function performAPICommand(caller, anonymousCommand, data) {
     assert(typeof caller === 'object');
     assert(typeof data === 'object');
-    assert(typeof (await apiHelpers.postCommand(caller, anonymousCommand, 'anonymized', '', data)) === 'object');
-    return await apiHelpers.postCommand(caller, anonymousCommand, 'anonymized', '', data);
+    const response = await apiHelpers.postCommand(caller, anonymousCommand, 'anonymized', '', data);
+    assert(typeof response === 'object');
+    return response;
 }
 
 postsAPI.anonymous = async function (caller, data) {
