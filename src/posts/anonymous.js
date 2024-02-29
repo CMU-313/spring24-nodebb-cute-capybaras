@@ -1,7 +1,7 @@
 'use strict';
 
 const db = require('../database');
-const { assert } = require('../middleware');
+const assert = require('assert');
 const plugins = require('../plugins');
 
 module.exports = function (Posts) {
