@@ -254,6 +254,7 @@ postsAPI.move = async function (caller, data) {
     }
 };
 
+
 async function performAPICommand(caller, anonymousCommand, data) {
     assert(typeof caller === 'object');
     assert(typeof data === 'object');
