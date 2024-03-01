@@ -3,6 +3,7 @@
 const validator = require('validator');
 const _ = require('lodash');
 
+const assert = require('assert');
 const utils = require('../utils');
 const user = require('../user');
 const posts = require('../posts');
@@ -251,6 +252,22 @@ postsAPI.move = async function (caller, data) {
     if (!postDeleted && !topicDeleted) {
         socketHelpers.sendNotificationToPostOwner(data.pid, caller.uid, 'move', 'notifications:moved_your_post');
     }
+};
+
+async function performAPICommand(caller, anonymousCommand, data) {
+    assert(typeof caller === 'object');
+    assert(typeof data === 'object');
+    const response = await apiHelpers.postCommand(caller, anonymousCommand, 'anonymized', '', data);
+    assert(typeof response === 'object');
+    return response;
+}
+
+postsAPI.anonymous = async function (caller, data) {
+    return performAPICommand(caller, 'anonymous', data);
+};
+
+postsAPI.unanonymous = async function (caller, data) {
+    return performAPICommand(caller, 'unanonymous', data);
 };
 
 postsAPI.upvote = async function (caller, data) {
