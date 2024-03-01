@@ -1,7 +1,7 @@
 <!-- IF posts.display_moderator_tools -->
 <li class="dropdown-header">[[topic:tools]]</li>
 <li class="menu-item">
-    <!-- Anonymous Posting Toggle Button -->
+    <!-- Anonymous Posting Button -->
     <a component="post/anonymous" role="menuitem" tabindex="-1" href="#" data-anonymous="{posts.anonymous}">
         <div class="menu-icon-wrapper">
             <!-- Icon for Anonymous On state -->
@@ -9,7 +9,7 @@
             <!-- Icon for Anonymous Off state -->
             <i component="post/anonymous/off" class="fa fa-fw fa-eye-slash <!-- IF posts.anonymous -->hidden<!-- ENDIF posts.anonymous -->"></i>
         </div>
-        <span class="toggle-text">Toggle Anonymity</span>
+        <span class="toggle-text">Anonymize</span>
     </a>
 </li>
 <li>
