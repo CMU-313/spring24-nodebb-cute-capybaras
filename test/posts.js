@@ -13,6 +13,7 @@ const sleep = util.promisify(setTimeout);
 const db = require('./mocks/databasemock');
 const topics = require('../src/topics');
 const posts = require('../src/posts');
+const controllers = require('../src/controllers');
 const categories = require('../src/categories');
 const privileges = require('../src/privileges');
 const user = require('../src/user');
@@ -77,6 +78,24 @@ describe('Post\'s', () => {
             });
         });
     });
+
+    it('should get post based on sort criteria', async () => {
+        const oldUid = await user.create({ username: 'olduser' });
+        const postResult = await topics.post({ uid: oldUid, cid: cid, title: 'change owner', content: 'original post' });
+        const postData = await topics.reply({ uid: oldUid, tid: postResult.topicData.tid, content: 'firstReply' });
+        const postData2 = await topics.reply({ uid: oldUid, tid: postResult.topicData.tid, content: 'firstReply' });
+        const postData3 = await topics.reply({ uid: oldUid, tid: postResult.topicData.tid, content: 'firstReply' });
+        /* postsController.getPosts = async function (req, res, next) {
+            await getPostsFromUserSet('account/posts', req, res, next);
+        }; */
+        posts = controllers.accounts.posts.getPosts({ req: { uid: oldUid, query: { sort: 'lastpost' } }, res: {}, next: () => {} });
+        assert.equal(posts.length, 4);
+        assert.equal(posts[0].pid, postData3.pid);
+        assert.equal(posts[1].pid, postData2.pid);
+        assert.equal(posts[2].pid, postData.pid);
+        assert.equal(posts[3].pid, postResult.postData.pid);
+    });
+
     // ChatGPT Wrote this
     // Test suite for checking the anonymous toggle functionality on posts
     describe('anonymous toggle functionality', () => {
@@ -125,7 +144,7 @@ describe('Post\'s', () => {
         assert.equal(data.categories[0].teaser.pid, postResult.postData.pid);
         assert.equal(data.categories[0].posts[0].content, '123456789');
         assert.equal(data.categories[0].posts[0].pid, postResult.postData.pid);
-    });
+    });     
 
     it('should change owner of post and topic properly', async () => {
         const oldUid = await user.create({ username: 'olduser' });
