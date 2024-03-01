@@ -62,13 +62,13 @@ type ComposerData = {
     timestamp: number,
     content: string,
     fromQueue: boolean,
-    anonymous: boolean,
     tid?: number,
     cid?: number,
     title?: string,
     tags?: string[],
     thumb?: string,
     noscript?: string,
+    anonymous: boolean,
 }
 
 type QueueResult = {
@@ -88,7 +88,7 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
         timestamp: Date.now(),
         content: body.content,
         fromQueue: false,
-        anonymous: false
+        anonymous: false,
     };
     req.body.noscript = 'true';
 

@@ -31,6 +31,8 @@ describe('Post\'s', () => {
     let postData;
     let topicData;
     let cid;
+    let uid;
+    let pid;
 
     before((done) => {
         async.series({
