@@ -57,11 +57,7 @@ function post(req, res) {
             timestamp: Date.now(),
             content: body.content,
             fromQueue: false,
-<<<<<<< HEAD
-            anonymous: false
-=======
             anonymous: false,
->>>>>>> main
         };
         req.body.noscript = 'true';
         if (!data.content) {
