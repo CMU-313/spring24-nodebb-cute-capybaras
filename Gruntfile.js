@@ -37,7 +37,18 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-watch')
 
-  grunt.registerTask('default', ['watch'])
+  grunt.registerTask('flow-check', 'Run Flow type checks', function () {
+    var done = this.async();
+    require('child_process').exec('npm run flow', function (err, stdout, stderr) {
+      console.log(stdout);
+      if (stderr) {
+        console.error(stderr);
+      }
+      done(err === null);
+    });
+  });
+
+  grunt.registerTask('default', ['watch', 'flow-check'])
 
   grunt.registerTask('init', async function () {
     const done = this.async()
