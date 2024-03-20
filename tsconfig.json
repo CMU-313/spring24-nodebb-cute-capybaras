@@ -9,7 +9,7 @@
   "include": [
     "public/src/**/*",
     "src/**/*", 
-    "test/**/*",
+    "test/**/*", "test/translator.js",
   ],
   "exclude":[
     "node_modules",
